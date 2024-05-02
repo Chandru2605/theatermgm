@@ -13,40 +13,20 @@ import java.util.Scanner;
 
 public class ShowAPI {
     static Scanner sc = new Scanner(System.in);
-    private static void addShows(int scr_id,long date,int mrng,int aftr,int night) throws Exception{
-        String query1 = "insert into theater.Show(ScreenID,MovieID,ShowTime,Date) values("+scr_id+","+mrng+",1,"+date+")";
-        String query2 = "insert into theater.Show(ScreenID,MovieID,ShowTime,Date) values("+scr_id+","+aftr+",2,"+date+")";
-        String query3 = "insert into theater.Show(ScreenID,MovieID,ShowTime,Date) values("+scr_id+","+night+",3,"+date+")";
+    private static int addShows(int scr_id, long date, int movie, int showTime, int spec) throws Exception{
+        String query1 = "insert into theater.Show(ScreenID,MovieID,ShowTime,Date,Special) values("+scr_id+","+movie+","+showTime+","+date+","+spec+")";
         ConnectionUtil.insertQuery(query1);
-        String getMrngShowID = "Select ShowID from theater.Show where ScreenID ="+scr_id+" and ShowTime = 1 and date = "+date+" ";
+        String getMrngShowID = "Select ShowID from theater.Show where ScreenID ="+scr_id+" and ShowTime = "+showTime+" and date = "+date+" ";
         ResultSet rs1 = ConnectionUtil.selectQuery(getMrngShowID);
         rs1.next();
-        int mrng_shw_id = rs1.getInt(1);
-        addShowSeat(scr_id,mrng_shw_id);
-        ConnectionUtil.insertQuery(query2);
-        String getAftrShowID = "Select ShowID from theater.Show where ScreenID ="+scr_id+" and ShowTime = 2 and date = "+date+";";
-        ResultSet rs2 = ConnectionUtil.selectQuery(getAftrShowID);
-        rs2.next();
-        int aftr_shw_id = rs2.getInt(1);
-        addShowSeat(scr_id,aftr_shw_id);
-        ConnectionUtil.insertQuery(query3);
-        String getNightShowID = "Select ShowID from theater.Show where ScreenID ="+scr_id+" and ShowTime = 3 and date = "+date+";";
-        ResultSet rs3 = ConnectionUtil.selectQuery(getNightShowID);
-        rs3.next();
-        int night_shw_id = rs3.getInt(1);
-        addShowSeat(scr_id,night_shw_id);
+        int showID = rs1.getInt(1);
+        return showID;
     }
-
     public static void add_Shows(int orgId) throws Exception, InvalidException {
         TheaterAPI.getTheaterDetails(orgId);
-        System.out.println("Enter Date:[yyyy-mm-dd]");
-        String date = sc.next();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Date da =  formatter.parse(date);
-        long fDate = da.getTime();
         System.out.println("Enter Theater ID:  ");
         int theaterID = sc.nextInt();
-        TheaterAPI.checkTheater(theaterID, orgId);
+        TheaterAPI.checkTheaterID(theaterID, orgId);
         String q = "Select ScreenNumber from Screen where TheaterID = "+theaterID+" ";;
         ResultSet r = ConnectionUtil.selectQuery(q);
         ArrayList<String> screenNames = new ArrayList<>();
@@ -62,20 +42,86 @@ public class ShowAPI {
             ResultSet rs = ConnectionUtil.selectQuery(query);
             rs.next();
             int scrId = rs.getInt(1);
+            System.out.println("Enter Date:[yyyy-mm-dd]");
+            String date = sc.next();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            Date da =  formatter.parse(date);
+            long fDate = da.getTime();
             if (ScreenAPI.getScreenBookedStatus(scrId, fDate)) {
                 throw new InvalidException("Already Updated");
             }
-            MovieAPI.showMovieDetails();
-                System.out.println("Morning Movie ID: ");
-                int mrng_mov = sc.nextInt();
-                System.out.println("Afternoon Movie ID: ");
-                int aftr_mov = sc.nextInt();
-                System.out.println("Night Movie ID: ");
-                int night_mov = sc.nextInt();
-                addShows(scrId, fDate, mrng_mov, aftr_mov, night_mov);
-                System.out.println("Shows updated successfully");
+            showCheck(scrId,fDate);
+            System.out.println("Shows updated successfully");
 
     }
+
+    private static void showCheck(int scrId, long fDate) throws Exception {
+        System.out.println("Do you want morning movie will be a Special Movie?[1-Yes/2-No]");
+        int Mchoice  =sc.nextInt();
+        if(Mchoice==1){
+            MovieAPI.showMovieDetails();
+            System.out.println("Choose Morning Movie ID: ");
+            int mrngSpecMov = sc.nextInt();
+            int mShwID = addShows(scrId,fDate,mrngSpecMov,1,1);
+            addShowSeat(scrId,mShwID);
+            addSpecialShow(scrId,mShwID);
+        }
+        else{
+            MovieAPI.showMovieDetails();
+            System.out.println("Choose Morning Movie ID: ");
+            int mrngMov = sc.nextInt();
+            int shwID = addShows(scrId,fDate,mrngMov,1,0);
+            addShowSeat(scrId,shwID);
+        }
+        System.out.println("Do you want afternoon movie will be a Special Movie?[1-Yes/2-No]");
+        int Achoice  =sc.nextInt();
+        if(Achoice==1){
+            MovieAPI.showMovieDetails();
+            System.out.println("Choose Morning Movie ID: ");
+            int aftrSpecMov = sc.nextInt();
+            int aShwID = addShows(scrId,fDate,aftrSpecMov,2,1);
+            addShowSeat(scrId,aShwID);
+            addSpecialShow(scrId,aShwID);
+        }
+        else{
+            MovieAPI.showMovieDetails();
+            System.out.println("Choose Morning Movie ID: ");
+            int mrngSpecMov = sc.nextInt();
+            int shwID= addShows(scrId,fDate,mrngSpecMov,2,0);
+            addShowSeat(scrId,shwID);
+        }
+        System.out.println("Do you want Evening movie will be a Special Movie?[1-Yes/2-No]");
+        int Echoice  =sc.nextInt();
+        if(Echoice==1){
+            MovieAPI.showMovieDetails();
+            System.out.println("Choose Morning Movie ID: ");
+            int aftrSpecMov = sc.nextInt();
+            int nShwID = addShows(scrId,fDate,aftrSpecMov,3,1);
+            addSpecialShow(scrId,nShwID);
+            addShowSeat(scrId,nShwID);
+        }
+        else{
+            MovieAPI.showMovieDetails();
+            System.out.println("Choose Morning Movie ID: ");
+            int mrngSpecMov = sc.nextInt();
+            int shwID = addShows(scrId,fDate,mrngSpecMov,3,0);
+            addShowSeat(scrId,shwID);
+        }
+
+    }
+
+    private static void addSpecialShow(int scrId,int shwID) throws Exception {
+        String query = "SELECT C.ClassID, C.ClassName, C.Rate FROM Screen S INNER JOIN Seat SE ON S.ScreenID = SE.ScreenID  INNER JOIN `class` C ON C.ClassID = SE.ClassID  WHERE S.ScreenID = "+scrId+" GROUP BY  C.ClassID;";
+        ResultSet rs = ConnectionUtil.selectQuery(query);
+        while (rs.next()){
+            System.out.println("Enter "+rs.getString(2)+" Class Special Amount: ");
+            int specAmount = sc.nextInt();
+            int clasID = rs.getInt(1);
+            String query1 = "insert into theater.SpecialShow(ShowID,ClassID,Amount) values("+shwID+","+clasID+","+specAmount+")";
+            ConnectionUtil.insertQuery(query1);
+        }
+    }
+
     private static void addShowSeat(int scr_id,int shw_id) throws Exception{
         String getSeatID = "Select SeatID from Seat where ScreenID="+scr_id+" ";
         ResultSet r = ConnectionUtil.selectQuery(getSeatID);

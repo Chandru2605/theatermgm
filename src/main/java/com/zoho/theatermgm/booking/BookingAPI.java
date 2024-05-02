@@ -11,9 +11,9 @@ import java.util.*;
 public class BookingAPI {
     static Scanner sc = new Scanner(System.in);
     public static void showAvailableSeatsToBook(int showID) throws Exception {
-        String query = "SELECT ShowSeat.ShowSeatID,Seat.seatNumber,C.className,ShowSeat.status,C.rate FROM ShowSeat INNER JOIN Seat ON ShowSeat.seatID = Seat.seatID INNER JOIN `class` C on C.classID = Seat.classID WHERE ShowSeat.showID = "+showID+" order by ShowSeat.ShowSeatID;";
+        String query = "SELECT DISTINCT SS.ShowSeatID,S.SeatNumber, C.ClassName, SS.Status, CASE WHEN SP.Amount IS NOT NULL THEN SP.Amount ELSE C.Rate END AS Amount FROM ShowSeat SS INNER JOIN Seat S ON SS.SeatID = S.SeatID INNER JOIN `Class` C ON S.ClassID = C.ClassID LEFT JOIN SpecialShow SP ON SS.ShowID = SP.ShowID AND S.ClassID = SP.ClassID WHERE SS.ShowID = "+showID+" order by SS.ShowSeatID;";
         ResultSet rs = ConnectionUtil.selectQuery(query);
-        System.out.println("ID   SeatNumber   Class    Status    Rate");
+        System.out.println("ID   SeatNumber   Class    Status    Amount");
         System.out.println("-----------------------------------------");
         while (rs.next()){
             System.out.print(rs.getInt(1)+"       ");
@@ -67,7 +67,7 @@ public class BookingAPI {
     private static int getAmount(ArrayList<Integer> showSeatIDs) throws Exception {
         int amount = 0;
         for(Integer i:showSeatIDs){
-            String q = "SELECT C.rate FROM ShowSeat INNER JOIN Seat ON ShowSeat.seatID = Seat.seatID INNER JOIN `class` C on C.classID = Seat.classID WHERE ShowSeat.showSeatID = "+i+";";
+            String q = "SELECT DISTINCT CASE WHEN SP.Amount IS NOT NULL THEN SP.Amount ELSE C.Rate END AS Amount FROM ShowSeat SS INNER JOIN Seat S ON SS.SeatID = S.SeatID INNER JOIN `Class` C ON S.ClassID = C.ClassID LEFT JOIN SpecialShow SP ON SS.ShowID = SP.ShowID AND S.ClassID = SP.ClassID WHERE SS.ShowSeatID = "+i+";";
             ResultSet r = ConnectionUtil.selectQuery(q);
             r.next();
             amount += r.getInt(1);
@@ -127,6 +127,22 @@ public class BookingAPI {
         return seatNos;
     }
 
+    private static void checkShowSeatID(int showSeatID, int showID) throws Exception, InvalidException {
+        String q = "Select * from theater.showSeat where `showSeat`.showID = "+showID+" and showSeatID = "+showSeatID+" and status=0";
+        ResultSet r = ConnectionUtil.selectQuery(q);
+        if(!r.next()){
+            throw new InvalidException("ID invalid");
+        }
+    }
+
+    private static void checkShowID(int showID) throws Exception, InvalidException {
+        String q = "Select * from theater.show where `show`.showID = "+showID+"";
+        ResultSet r = ConnectionUtil.selectQuery(q);
+        if(!r.next()){
+            throw new InvalidException("Show invalid");
+        }
+    }
+
     public static void bookTickets(int uId) throws Exception, InvalidException {
         ArrayList<MovieDetails> movies = getMovies();
         showMovies(movies);
@@ -146,22 +162,5 @@ public class BookingAPI {
         setBooking(showSeatIDs,showID,uId);
         printDetails(showSeatIDs);
     }
-
-    private static void checkShowSeatID(int showSeatID, int showID) throws Exception, InvalidException {
-        String q = "Select * from theater.showSeat where `showSeat`.showID = "+showID+" and showSeatID = "+showSeatID+" and status=0";
-        ResultSet r = ConnectionUtil.selectQuery(q);
-        if(!r.next()){
-            throw new InvalidException("ID invalid");
-        }
-    }
-
-    private static void checkShowID(int showID) throws Exception, InvalidException {
-        String q = "Select * from theater.show where `show`.showID = "+showID+"";
-        ResultSet r = ConnectionUtil.selectQuery(q);
-        if(!r.next()){
-            throw new InvalidException("Show invalid");
-        }
-    }
-
 
 }

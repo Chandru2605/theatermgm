@@ -7,14 +7,11 @@ import java.sql.ResultSet;
 import java.util.Scanner;
 public class TheaterAPI {
     static Scanner sc = new Scanner(System.in);
-    public static boolean checkTheater(int theaterID, int orgId) throws Exception {
-        String query = "Select TheaterID from Theater where TheaterID = "+theaterID+" and orgID = "+orgId+"";
-        ResultSet rs = ConnectionUtil.selectQuery(query);
-        if(rs.next()){
-            return true;
-        }
-        else{
-            return false;
+    public static void checkTheaterID(int theaterID, int orgID) throws Exception, InvalidException {
+        String q = "select * from theater where theaterID = "+theaterID+" and orgID = "+orgID+";";
+        ResultSet r = ConnectionUtil.selectQuery(q);
+        if(!r.next()){
+            throw new InvalidException("Invalid Theater ID");
         }
     }
     public static int getTheaterID(String theaterName, String location) throws Exception{

@@ -35,6 +35,7 @@ public class CancellationAPI {
         showBookings(uId);
         System.out.println("Enter Booking ID: ");
         int bookingID  = sc.nextInt();
+        checkBookingID(bookingID,uId);
         showBookingDetails(bookingID);
         boolean bookingOccur = checkBooking(bookingID);
         if(!bookingOccur){
@@ -45,7 +46,9 @@ public class CancellationAPI {
         System.out.println("Enter IDs: ");
         ArrayList<Integer> bookingSeatIdToCancel = new ArrayList<>();
         for(int i=0;i<no_of_seats;i++){
-            bookingSeatIdToCancel.add(sc.nextInt());
+            int bID = sc.nextInt();
+            checkBookingSeatID(bID);
+            bookingSeatIdToCancel.add(bID);
         }
         int refundedAmount = getRefundAmount(bookingSeatIdToCancel);
         int showID = getShowID(bookingID);
@@ -53,6 +56,23 @@ public class CancellationAPI {
         updateBookingSeat(bookingSeatIdToCancel);
         updateShowSeat(bookingSeatIdToCancel);
         printCancelReport(bookingSeatIdToCancel,bookingID,refundedAmount);
+    }
+
+    private static void checkBookingSeatID(int bID) throws Exception, InvalidException {
+        String q = "select * from bookingSeat where bookingSeatID = "+bID+";";
+        ResultSet r = ConnectionUtil.selectQuery(q);
+        if(!r.next()){
+            throw new InvalidException("Invalid Booking ID");
+        }
+    }
+
+    private static void checkBookingID(int bookingID, int uId) throws Exception, InvalidException {
+            String q = "select * from booking where bookingID = "+bookingID+" and cusID = "+uId+";";
+            ResultSet r = ConnectionUtil.selectQuery(q);
+            if(!r.next()){
+                throw new InvalidException("Invalid Booking ID");
+            }
+
     }
 
     private static boolean checkBooking(int bookingID) throws Exception, InvalidException {
@@ -71,12 +91,11 @@ public class CancellationAPI {
     private static void showBookings(int uID) throws Exception, InvalidException {
         String currentTime = new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());;
         String q = "SELECT B.BookingID,M.title,T.Theatername,T.location,FROM_UNIXTIME(B.Date / 1000, '%Y-%m-%d') AS BookingDate,FROM_UNIXTIME(SH.Date / 1000, '%Y-%m-%d') AS ShowDate,SH.showtime,SUM(CASE WHEN B.`Option` = 'Book' THEN B.noOfSeats ELSE 0 END) AS NoOfSeatsBooked,SUM(CASE WHEN B.`Option` = 'Book' THEN B.amount ELSE 0 END) AS Paid FROM Booking B INNER JOIN Customer C on C.ID = B.cusID INNER JOIN `Show` SH ON B.showId = SH.showId INNER JOIN Screen SC ON SH.screenId = SC.screenId INNER JOIN Movie M on SH.MovieID = M.MovieID INNER JOIN Theater T ON SC.theaterId = T.theaterId WHERE C.ID = "+uID+" and FROM_UNIXTIME(SH.Date / 1000, '%Y-%m-%d')>='"+currentTime+"' and B.option = 'Book' GROUP BY T.TheaterID,B.`BookingID`;";
-        ResultSet rs = ConnectionUtil.selectQuery(q);
-        if(rs.next()){
-            ResultSet r = ConnectionUtil.selectQuery(q);
+        ResultSet r = ConnectionUtil.selectQuery(q);
+        if(r.next()){
             System.out.println("ID    Movie   Theater   Location     BookingDate    ShowDate    ShowTime       Booked    Paid");
             System.out.println("---------------------------------------------------------------------------------------------");
-            while (r.next()){
+            do{
                 System.out.print(r.getInt(1)+"    ");
                 System.out.print(r.getString(2)+"      ");
                 System.out.print(r.getString(3)+"     ");
@@ -86,7 +105,7 @@ public class CancellationAPI {
                 System.out.print(r.getString(7)+"     ");
                 System.out.print(r.getInt(8)+"         ");
                 System.out.println(r.getInt(9)+"          ");
-            }
+            }while (r.next());
         }
         else{
             throw new InvalidException("You have no booking yet");
@@ -121,7 +140,7 @@ public class CancellationAPI {
     private static int getRefundAmount(ArrayList<Integer> bookingSeatIdToCancel) throws Exception {
         int amount = 0;
         for(Integer i:bookingSeatIdToCancel){
-            String q = "SELECT C.rate FROM BookingSeat  INNER JOIN Booking ON Booking.BookingID = BookingSeat.BookingID INNER JOIN ShowSeat ON BookingSeat.ShowSeatID = ShowSeat.ShowSeatID INNER JOIN Seat ON ShowSeat.SeatID = Seat.SeatID INNER JOIN `Class` C on C.classID = Seat.classID where BookingSeat.BookingSeatID ="+i+" ";
+            String q = "SELECT DISTINCT CASE WHEN SP.Amount IS NOT NULL THEN SP.Amount ELSE C.Rate END AS Amount FROM BookingSeat INNER JOIN Booking ON Booking.BookingID = BookingSeat.BookingID INNER JOIN ShowSeat ON BookingSeat.ShowSeatID = ShowSeat.ShowSeatID INNER JOIN `Show` S ON ShowSeat.ShowID = S.ShowID INNER JOIN Seat ON ShowSeat.SeatID = Seat.SeatID INNER JOIN `Class` C ON C.ClassID = Seat.ClassID LEFT JOIN SpecialShow SP ON ShowSeat.ShowID = SP.ShowID AND Seat.ClassID = SP.ClassID WHERE BookingSeat.BookingSeatID = "+i+";";
             ResultSet r = ConnectionUtil.selectQuery(q);
             r.next();
             amount += r.getInt(1);

@@ -86,9 +86,7 @@ public class ScreenAPI {
         TheaterAPI.getTheaterDetails(orgId);
         System.out.println("Enter Theater ID: ");
         int theaterID = sc.nextInt();
-        if(!TheaterAPI.checkTheater(theaterID,orgId)){
-            throw new InvalidException("Invalid Theater ID");
-        }
+        TheaterAPI.checkTheaterID(theaterID,orgId);
             TheaterAPI.showScreensInTheater(theaterID);
             System.out.println("Screen number to add: ");
             int screenNumber = sc.nextInt();
