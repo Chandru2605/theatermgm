@@ -1,9 +1,8 @@
 package com.zoho.theatermgm.customer;
 
-import com.zoho.theatermgm.CommonAPI;
+import com.zoho.theatermgm.accounts.AccountsAPI;
 import com.zoho.theatermgm.connection.ConnectionUtil;
 import com.zoho.theatermgm.exceptions.InvalidException;
-import com.zoho.theatermgm.user.UserAPI;
 
 import java.sql.ResultSet;
 import java.util.Scanner;
@@ -12,7 +11,7 @@ public class CustomerAPI {
 
     static Scanner sc = new Scanner(System.in);
     public static void main(String[] args) throws Exception, InvalidException {
-        int authID = CommonAPI.commonCases();
+        int authID = AccountsAPI.commonCases();
        if(checkAuthIdExsist(authID)){
            try{
                int uId = getUID(authID);
@@ -24,7 +23,6 @@ public class CustomerAPI {
        }
        else{
            try {
-               checkAuthIdExsistInOrg(authID);
                System.out.println("Customer Creation: ");
                System.out.println("Enter your name: ");
                String name = sc.next();
@@ -59,13 +57,6 @@ public class CustomerAPI {
             else{
                 throw new InvalidException("Not a user");
             }
-    }
-    public static void checkAuthIdExsistInOrg(int authID) throws Exception, InvalidException {
-        String q = "select id from org where authID = "+authID+";";
-        ResultSet r = ConnectionUtil.selectQuery(q);
-        if(r.next()){
-            throw new InvalidException("Invalid user");
-        }
     }
 
 }

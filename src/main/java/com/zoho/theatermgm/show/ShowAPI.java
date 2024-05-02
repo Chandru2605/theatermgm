@@ -5,6 +5,8 @@ import com.zoho.theatermgm.connection.ConnectionUtil;
 import com.zoho.theatermgm.movie.MovieAPI;
 import com.zoho.theatermgm.screen.ScreenAPI;
 import com.zoho.theatermgm.theater.TheaterAPI;
+
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -125,11 +127,16 @@ public class ShowAPI {
     private static void addShowSeat(int scr_id,int shw_id) throws Exception{
         String getSeatID = "Select SeatID from Seat where ScreenID="+scr_id+" ";
         ResultSet r = ConnectionUtil.selectQuery(getSeatID);
+        String q3 = "insert into theater.ShowSeat(ShowID,SeatID) values(?,?)";
+        PreparedStatement insert = ConnectionUtil.con.prepareStatement(q3);
         while (r.next()){
             int seatId = r.getInt(1);
-            String q3 = "insert into theater.ShowSeat(ShowID,SeatID) values("+shw_id+","+seatId+")";
-            ConnectionUtil.insertQuery(q3);
+            insert.setInt(1,shw_id);
+            insert.setInt(2,seatId);
+            insert.addBatch();
         }
+        insert.executeBatch();
+        insert.clearBatch();
     }
 
 }

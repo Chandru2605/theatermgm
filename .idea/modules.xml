@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/theater/theater.iml" filepath="$PROJECT_DIR$/theater/theater.iml" />
       <module fileurl="file://$PROJECT_DIR$/theatermgm.iml" filepath="$PROJECT_DIR$/theatermgm.iml" />
     </modules>
   </component>

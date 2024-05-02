@@ -1,4 +1,4 @@
-package com.zoho.theatermgm;
+package com.zoho.theatermgm.accounts;
 
 import com.zoho.theatermgm.connection.ConnectionUtil;
 import com.zoho.theatermgm.exceptions.InvalidException;
@@ -6,7 +6,7 @@ import com.zoho.theatermgm.exceptions.InvalidException;
 import java.sql.ResultSet;
 import java.util.Scanner;
 
-public class CommonAPI {
+public class AccountsAPI {
     static Scanner sc = new Scanner(System.in);
     public static int commonCases(){
         boolean loop = true;
@@ -92,7 +92,7 @@ public class CommonAPI {
         System.out.println("Registration: ");
         System.out.println("Enter Email: ");
         String email = sc.next();
-        boolean emailExists = CommonAPI.checkEmailExists(email);
+        boolean emailExists = AccountsAPI.checkEmailExists(email);
         if(emailExists){
             throw new InvalidException("User already exists");
         }
