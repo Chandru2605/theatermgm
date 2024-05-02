@@ -8,8 +8,8 @@ import com.zoho.theater.theater.TheaterAPI;
 import java.util.Scanner;
 
 public class UserOptions {
-    public static void options(String uName, String name, int uId) throws Exception, InvalidException {
-        System.out.println("Welcome " + name);
+    public static void options(int orgID,int authID) throws Exception, InvalidException {
+        System.out.println("Welcome ");
         boolean loop = true;
         Scanner sc = new Scanner(System.in);
         while (loop) {
@@ -18,26 +18,46 @@ public class UserOptions {
             switch (choice) {
                 case 1: {
                     System.out.println("Add Theater Section");
-                    TheaterAPI.addTheaters(uId);
+                    try {
+                        TheaterAPI.addTheaters(orgID);
+                    }
+                    catch (InvalidException e){
+                        System.out.println(e.getMessage());
+                    }
                 }
                 break;
                 case 2: {
                     System.out.println("Add Screen Section");
-                    ScreenAPI.add_Screen(uId);
+                    try{
+                        ScreenAPI.add_Screen(orgID);
+                    }
+                    catch (InvalidException e){
+                        System.out.println(e.getMessage());
+                    }
                 }
                 break;
                 case 3: {
                     System.out.println("Add Shows Section");
-                    ShowAPI.add_Shows(uId);
+                   try{
+                       ShowAPI.add_Shows(orgID);
+                   }
+                   catch (InvalidException e){
+                       System.out.println(e.getMessage());
+                   }
                 }
                 break;
                 case 4: {
                     System.out.println("View Report Section");
-                    RevenueReport.revenueReport(uId);
+                    RevenueReport.revenueReport(orgID);
                 }
                 break;
                 case 5: {
-                    TheaterAPI.getTheaterDetails(uId);
+                   try {
+                       TheaterAPI.getTheaterDetails(orgID);
+                   }
+                   catch (InvalidException e){
+                       System.out.println(e.getMessage());
+                   }
                 }
                 break;
                 case 6: {

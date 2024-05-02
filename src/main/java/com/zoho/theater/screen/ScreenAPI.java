@@ -19,16 +19,54 @@ public class ScreenAPI {
             return -1;
         }
     }
-    public static void addSeats(int screenId,int noOfSeats,int noOfSecondClassSeats,int noOfFirstClassSeats) throws Exception{
-        for(int i=1;i<=noOfSecondClassSeats;i++){
-            String query = "insert into Seat(ScreenID,SeatNumber,ClassID) values("+screenId+","+i+",2)";
-            ConnectionUtil.insertQuery(query);
-        }
-        for(int i=noOfSecondClassSeats+1;i<=noOfSeats;i++){
-            String query = "insert into Seat(ScreenID,SeatNumber,ClassID) values("+screenId+","+i+",1)";
-            ConnectionUtil.insertQuery(query);
+    public static void addSeats(int screenId) throws Exception, InvalidException {
+        int start = 1;
+        System.out.println("No of Seats to add: ");
+        int noOfSeats = sc.nextInt();
+        showClassDetails();
+        while (noOfSeats>0){
+            System.out.println("Enter class ID: ");
+            int clsID = sc.nextInt();
+            try {
+                checkClassID(clsID);
+                System.out.println("Enter no of seat for the class: ");
+                int seatCount = sc.nextInt();
+                if (seatCount > noOfSeats) {
+                    throw new InvalidException("Seat Limit Exceeded");
+                }
+                int a = start + seatCount;
+                for (int i = start; i < a; i++) {
+                    String query = "insert into Seat(ScreenID,SeatNumber,ClassID) values(" + screenId + "," + i + "," + clsID + ")";
+                    ConnectionUtil.insertQuery(query);
+                    noOfSeats--;
+                }
+                System.out.println("Remaining seats to add: " + noOfSeats);
+                start += seatCount;
+            }
+            catch (InvalidException e){
+                System.out.println(e.getMessage());
+            }
         }
     }
+
+    private static void checkClassID(int clsID) throws Exception, InvalidException {
+        String q = "select * from theater.class where classID = "+clsID+";";
+        ResultSet r = ConnectionUtil.selectQuery(q);
+        if(!r.next()){
+            throw new InvalidException("Invalid Class ID Chosen");
+        }
+    }
+
+    private static void showClassDetails() throws Exception {
+        String q = "Select * from theater.class";;
+        ResultSet r = ConnectionUtil.selectQuery(q);
+        System.out.println("ID    Class    Amount");
+        System.out.println("---------------------");
+        while (r.next()){
+            System.out.println(r.getInt(1)+"     "+r.getString(2)+"      "+r.getInt(3));
+        }
+    }
+
     public static boolean getScreenBookedStatus(int scrId, long date) throws Exception{
         String q = "Select * from theater.Show where ScreenID = "+scrId+" and Date = "+date+" ";;
         ResultSet r = ConnectionUtil.selectQuery(q);
@@ -44,14 +82,14 @@ public class ScreenAPI {
         ConnectionUtil.insertQuery(query);
         return getScreenID(screenNumber,theaterID);
     }
-    public static void add_Screen(int uId) throws Exception,InvalidException {
-        TheaterAPI.getTheaterDetails(uId);
+    public static void add_Screen(int orgId) throws Exception,InvalidException {
+        TheaterAPI.getTheaterDetails(orgId);
         System.out.println("Enter Theater ID: ");
         int theaterID = sc.nextInt();
-        if(!TheaterAPI.checkTheater(theaterID)){
+        if(!TheaterAPI.checkTheater(theaterID,orgId)){
             throw new InvalidException("Invalid Theater ID");
         }
-        TheaterAPI.showScreensInTheater(theaterID);
+            TheaterAPI.showScreensInTheater(theaterID);
             System.out.println("Screen number to add: ");
             int screenNumber = sc.nextInt();
             String query = "Select ScreenID from Screen where ScreenNumber = '" + screenNumber + "' and TheaterID = " + theaterID + " ";
@@ -59,25 +97,15 @@ public class ScreenAPI {
             if (rs.next()) {
                 throw new InvalidException("Theater already have this screen");
             }
-                System.out.println("No of Seats: ");
-                int noOfSeats = sc.nextInt();
-                System.out.println("No of Second Class Seats: ");
-                int noOfSecondClassSeats = sc.nextInt();
-                System.out.println("No of First Class Seats: ");
-                int noOfFirstClassSeats = sc.nextInt();
-                int scr_id = addScreen(screenNumber, theaterID);
-                addSeats(scr_id, noOfSeats, noOfSecondClassSeats,noOfFirstClassSeats);
-                System.out.println("Screen " + screenNumber + " added successfully for Theater ");
+               
+              int scr_id = addScreen(screenNumber, theaterID);
+               try {
+                   addSeats(scr_id);
+                   System.out.println("Screen " + screenNumber + " added successfully for Theater ");
+               }
+               catch (InvalidException e){
+                   System.out.println(e.getMessage());
+               }
     }
-
-//    private static void showAvailableClasses() throws Exception {
-//        String q = "Select classID,className,rate from `class`";
-//        ResultSet r = ConnectionUtil.selectQuery(q);
-//        System.out.println("ClassID   ClassName   Rate");
-//        System.out.println("---------------------------");
-//        while (r.next()){
-//            System.out.println(r.getInt(1)+"        "+r.getString(2)+"      "+r.getInt(3));
-//        }
-//    }
 
 }

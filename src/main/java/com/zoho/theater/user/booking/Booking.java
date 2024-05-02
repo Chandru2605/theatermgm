@@ -28,22 +28,28 @@ public class Booking {
             System.out.println(rs.getInt(5));
         }
     }
-    private static ArrayList<MovieDetails> getMovies() throws Exception {
+    private static ArrayList<MovieDetails> getMovies() throws Exception, InvalidException {
         String q = "SELECT  S.SHowID,M.title AS movie_title,S.Date,SC.ScreenNumber,S.ShowTime,T.TheaterName,T.Location FROM Movie M INNER JOIN `Show` S ON M.MovieID = S.movieID INNER JOIN Screen SC ON S.screenID = SC.screenID INNER JOIN Theater T ON SC.theaterID = T.theaterID order by M.title;";
         ArrayList<MovieDetails> movies = new ArrayList<>();
-        ResultSet rs = ConnectionUtil.selectQuery(q);
-        while (rs.next()){
-            int shwID = rs.getInt(1);
-            String name = rs.getString(2);
-            long date = rs.getLong(3);
-            int scrNum = rs.getInt(4);
-            String shwTime = rs.getString(5);
-            String tname = rs.getString(6);
-            String loc = rs.getString(7);
-            MovieDetails md = new MovieDetails(shwID,name,date,scrNum,shwTime,tname,loc);
-            movies.add(md);
+        ResultSet r = ConnectionUtil.selectQuery(q);
+        if(r.next()){
+            ResultSet rs = ConnectionUtil.selectQuery(q);
+            while (rs.next()){
+                int shwID = rs.getInt(1);
+                String name = rs.getString(2);
+                long date = rs.getLong(3);
+                int scrNum = rs.getInt(4);
+                String shwTime = rs.getString(5);
+                String tname = rs.getString(6);
+                String loc = rs.getString(7);
+                MovieDetails md = new MovieDetails(shwID,name,date,scrNum,shwTime,tname,loc);
+                movies.add(md);
+            }
+            return movies;
         }
-        return movies;
+        else {
+            throw new InvalidException("No Movies were Available");
+        }
     }
 
     private static void setBooking(ArrayList<Integer> showSeatIDs, int showID, int uId) throws Exception {
@@ -142,7 +148,7 @@ public class Booking {
     }
 
     private static void checkShowSeatID(int showSeatID, int showID) throws Exception, InvalidException {
-        String q = "Select * from theater.showSeat where `showSeat`.showID = "+showID+" and showSeatID = "+showSeatID+"";
+        String q = "Select * from theater.showSeat where `showSeat`.showID = "+showID+" and showSeatID = "+showSeatID+" and status=0";
         ResultSet r = ConnectionUtil.selectQuery(q);
         if(!r.next()){
             throw new InvalidException("ID invalid");

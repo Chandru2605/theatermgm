@@ -37,16 +37,16 @@ public class ShowAPI {
         addShowSeat(scr_id,night_shw_id);
     }
 
-    public static void add_Shows(int uId) throws Exception, InvalidException {
+    public static void add_Shows(int orgId) throws Exception, InvalidException {
         System.out.println("Enter Date:[yyyy-mm-dd]");
         String date = sc.next();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date da =  formatter.parse(date);
         long fDate = da.getTime();
-        TheaterAPI.getTheaterDetails(uId);
+        TheaterAPI.getTheaterDetails(orgId);
         System.out.println("Enter Theater ID:  ");
         int theaterID = sc.nextInt();
-        TheaterAPI.checkTheater(theaterID);
+        TheaterAPI.checkTheater(theaterID, orgId);
         String q = "Select ScreenNumber from Screen where TheaterID = "+theaterID+" ";;
         ResultSet r = ConnectionUtil.selectQuery(q);
         ArrayList<String> screenNames = new ArrayList<>();
