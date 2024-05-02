@@ -1,8 +1,8 @@
-package com.zoho.theater.customer;
+package com.zoho.theatermgm.customer;
 
-import com.zoho.theater.connection.ConnectionUtil;
-import com.zoho.theater.exceptions.InvalidException;
-import com.zoho.theater.user.UserAPI;
+import com.zoho.theatermgm.connection.ConnectionUtil;
+import com.zoho.theatermgm.exceptions.InvalidException;
+import com.zoho.theatermgm.user.UserAPI;
 
 import java.sql.ResultSet;
 import java.util.Scanner;
@@ -66,6 +66,8 @@ public class CustomerAPI {
             System.out.println(e.getMessage());
         }
     }
+
+
 
     private static void registerUser() throws Exception, InvalidException {
         System.out.println("Registration: ");

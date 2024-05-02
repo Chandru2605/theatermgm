@@ -1,9 +1,9 @@
-package com.zoho.theater.customer;
+package com.zoho.theatermgm.customer;
 
-import com.zoho.theater.connection.ConnectionUtil;
-import com.zoho.theater.exceptions.InvalidException;
-import com.zoho.theater.user.booking.Booking;
-import com.zoho.theater.user.cancellation.Cancellation;
+import com.zoho.theatermgm.connection.ConnectionUtil;
+import com.zoho.theatermgm.exceptions.InvalidException;
+import com.zoho.theatermgm.booking.BookingAPI;
+import com.zoho.theatermgm.booking.CancellationAPI;
 
 import java.sql.ResultSet;
 import java.util.Scanner;
@@ -21,7 +21,7 @@ public class CustomerOptions {
                 {
                     System.out.println("Book Ticket Section");
                    try{
-                       Booking.bookTickets(uId);
+                       BookingAPI.bookTickets(uId);
                    }
                    catch (InvalidException e){
                        System.out.println(e.getMessage());
@@ -43,7 +43,7 @@ public class CustomerOptions {
                 {
                     System.out.println("Cancel Ticket Section");
                     try{
-                        Cancellation.cancelSeats(uId);
+                        CancellationAPI.cancelSeats(uId);
                     }
                     catch (InvalidException e){
                         System.out.println(e.getMessage());

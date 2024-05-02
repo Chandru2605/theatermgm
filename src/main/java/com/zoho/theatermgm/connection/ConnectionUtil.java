@@ -1,4 +1,4 @@
-package com.zoho.theater.connection;
+package com.zoho.theatermgm.connection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

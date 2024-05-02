@@ -1,9 +1,10 @@
-package com.zoho.theater.user;
+package com.zoho.theatermgm.user;
 
-import com.zoho.theater.exceptions.InvalidException;
-import com.zoho.theater.screen.ScreenAPI;
-import com.zoho.theater.show.ShowAPI;
-import com.zoho.theater.theater.TheaterAPI;
+import com.zoho.theatermgm.analytics.RevenueReport;
+import com.zoho.theatermgm.exceptions.InvalidException;
+import com.zoho.theatermgm.screen.ScreenAPI;
+import com.zoho.theatermgm.show.ShowAPI;
+import com.zoho.theatermgm.theater.TheaterAPI;
 
 import java.util.Scanner;
 
@@ -48,7 +49,12 @@ public class UserOptions {
                 break;
                 case 4: {
                     System.out.println("View Report Section");
-                    RevenueReport.revenueReport(orgID);
+                    try{
+                        RevenueReport.revenueReport(orgID);
+                    }
+                    catch (InvalidException e){
+                        System.out.println(e.getMessage());
+                    }
                 }
                 break;
                 case 5: {

@@ -1,17 +1,16 @@
-package com.zoho.theater.user.cancellation;
+package com.zoho.theatermgm.booking;
 
-import com.zoho.theater.connection.ConnectionUtil;
-import com.zoho.theater.exceptions.InvalidException;
+import com.zoho.theatermgm.connection.ConnectionUtil;
+import com.zoho.theatermgm.exceptions.InvalidException;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
-public class Cancellation {
+public class CancellationAPI {
     static Scanner sc = new Scanner(System.in);
 
     private static void updateBookingSeat(ArrayList<Integer> bookingSeatIDs) throws Exception{

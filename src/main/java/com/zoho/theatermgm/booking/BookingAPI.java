@@ -1,14 +1,14 @@
-package com.zoho.theater.user.booking;
+package com.zoho.theatermgm.booking;
 
-import com.zoho.theater.connection.ConnectionUtil;
-import com.zoho.theater.exceptions.InvalidException;
-import com.zoho.theater.movie.MovieDetails;
+import com.zoho.theatermgm.connection.ConnectionUtil;
+import com.zoho.theatermgm.exceptions.InvalidException;
+import com.zoho.theatermgm.movie.MovieDetails;
 
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.*;
 
-public class Booking {
+public class BookingAPI {
     static Scanner sc = new Scanner(System.in);
     public static void showAvailableSeatsToBook(int showID) throws Exception {
         String query = "SELECT ShowSeat.ShowSeatID,Seat.seatNumber,C.className,ShowSeat.status,C.rate FROM ShowSeat INNER JOIN Seat ON ShowSeat.seatID = Seat.seatID INNER JOIN `class` C on C.classID = Seat.classID WHERE ShowSeat.showID = "+showID+" order by ShowSeat.ShowSeatID;";

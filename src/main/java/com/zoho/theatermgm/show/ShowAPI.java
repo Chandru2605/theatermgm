@@ -1,10 +1,10 @@
-package com.zoho.theater.show;
+package com.zoho.theatermgm.show;
 
-import com.zoho.theater.exceptions.InvalidException;
-import com.zoho.theater.connection.ConnectionUtil;
-import com.zoho.theater.movie.MovieAPI;
-import com.zoho.theater.screen.ScreenAPI;
-import com.zoho.theater.theater.TheaterAPI;
+import com.zoho.theatermgm.exceptions.InvalidException;
+import com.zoho.theatermgm.connection.ConnectionUtil;
+import com.zoho.theatermgm.movie.MovieAPI;
+import com.zoho.theatermgm.screen.ScreenAPI;
+import com.zoho.theatermgm.theater.TheaterAPI;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,12 +38,12 @@ public class ShowAPI {
     }
 
     public static void add_Shows(int orgId) throws Exception, InvalidException {
+        TheaterAPI.getTheaterDetails(orgId);
         System.out.println("Enter Date:[yyyy-mm-dd]");
         String date = sc.next();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date da =  formatter.parse(date);
         long fDate = da.getTime();
-        TheaterAPI.getTheaterDetails(orgId);
         System.out.println("Enter Theater ID:  ");
         int theaterID = sc.nextInt();
         TheaterAPI.checkTheater(theaterID, orgId);

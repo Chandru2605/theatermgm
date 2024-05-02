@@ -1,4 +1,4 @@
-package com.zoho.theater.movie;
+package com.zoho.theatermgm.movie;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

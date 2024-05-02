@@ -1,7 +1,7 @@
-package com.zoho.theater.user;
+package com.zoho.theatermgm.user;
 
-import com.zoho.theater.connection.ConnectionUtil;
-import com.zoho.theater.exceptions.InvalidException;
+import com.zoho.theatermgm.connection.ConnectionUtil;
+import com.zoho.theatermgm.exceptions.InvalidException;
 
 import java.sql.ResultSet;
 import java.util.Scanner;
